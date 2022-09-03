@@ -2,16 +2,22 @@
 // cypress/support/commands.js
 import 'cypress-mailhog';
 
+let token 
+before(() => {                        
+    cy.getToken('f@f.com', 'f').then(tkn => { 
+            token = tkn  
+  })
+})
 
-it('Deve registar um usuario', () => {
+it.skip('Deve registar um usuario', () => {
     cy.request({
         method:'POST',
         url: '/auth/register',
         body:{
-        email: "d@d.com",
-        document: "12345678956",
-        birthdate: "10082000",
-        password: "d"
+        email: "f@f.com",
+        document: "12345678968",
+        birthdate: "15092002",
+        password: "f"
         }
     }).as('response')
 
@@ -27,8 +33,8 @@ it('Deve fazer login em uma conta', () => {
         method: 'POST',
         url: '/auth/login',
         body: {  
-            email: "d@d.com",
-            password: "d"
+            email: "f@f.com",
+            password: "f"
         }
     }).as('response')
 
@@ -64,7 +70,7 @@ it('Deve mandar um código de confirmacao', () => {
         method: 'POST',
         url: '/auth/forgot_password/send_confirmation_code',
         body: {
-            email: 'd@d.com'
+            email: 'f@f.com'
         }
     }).as('response')
 
@@ -91,13 +97,12 @@ it.skip('Deve trocar a senha',() => {
     })
 })
 it('Deve listar todos os usuários', () =>{
-    cy.getToken('d@d.com', 'd').then(token =>{
         cy.request({
             method: 'GET',
             url:'/users',
             headers:{ Authorization: `Bearer ${token}` }
         }).as('response')
-    })
+    
     cy.get('@response').then(res => {
         expect(res.status).eq(200)  
         expect(res.body.message).eq('Fetching users')
@@ -107,17 +112,17 @@ it('Deve listar todos os usuários', () =>{
 })
 
 it('Deve procurar por id', () => {
-    cy.getId('d@d.com', 'd').then(id => {
-        cy.getToken('d@d.com', 'd').then(token => {
+    cy.getId('f@f.com', 'f').then(id => {    
             cy.request({
                 method: 'GET',
-                url : `/users/${id}`,
+                url : `users/${id}`,
                 headers: {Authorization : `Bearer ${token}`},
         }).as('response')
-    })
 })
     cy.get('@response').then(res => {
      expect(res.status).eq(200)  
+     expect(res.body.message).eq('User found successfully')
+     expect(res.body.data.user.email).not.be.empty
 
 })
     
@@ -144,9 +149,8 @@ it('Deve procurar por id', () => {
 //     })
 // })
 
-it('Deve alterar um usuário', () => {
-    cy.getId('d@d.com', 'd').then(id => {
-        cy.getToken('d@d.com', 'd').then(token => {
+it.skip('Deve alterar um usuário', () => {
+    cy.getId('e@e.com', 'e').then(id => {
             cy.request({
                 method: 'PUT',
                 url : `/users/${id}`,
@@ -159,7 +163,6 @@ it('Deve alterar um usuário', () => {
                     "status": "ACTIVE"
                 }
         }).as('response')
-    })
 })
     cy.get('@response').then(res => {
         expect(res.status).eq(200)
@@ -168,15 +171,13 @@ it('Deve alterar um usuário', () => {
 })
 
 it('Deve deletar o usuario', () => {
-    cy.getId('d@d.com', 'd').then(id => {
-        cy.getToken('d@d.com', 'd').then(token => {
+    cy.getId('f@f.com', 'f').then(id => {
             cy.request({
                 method: 'DELETE',
                 url : `/users/${id}`,
                 headers: { Authorization : `Bearer ${token}`}
             }).as('response')
 
-        })
     })
     cy.get('@response').then(res => {
         expect(res.status).eq(200)
