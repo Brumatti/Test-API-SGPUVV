@@ -1,0 +1,17 @@
+{
+  "name": "teste-spg-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cyopen": "cypress open"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cypress": "^10.7.0",
+    "cypress-mailhog": "^1.6.0"
+  }
+}
