@@ -54,8 +54,8 @@ Cypress.Commands.add('getIndex', (user, passwd) => {
         return a
     })
 })
-Cypress.Commands.add('getId', (user, passwd) => {
-    cy.getToken(user, passwd).then(token => {
+Cypress.Commands.add('getId', (user) => {
+    cy.getToken('a@a.com', 'a').then(token => {
         cy.request({
             method: 'GET',
             url:'/users',
@@ -66,6 +66,38 @@ Cypress.Commands.add('getId', (user, passwd) => {
                 .should('not.be.empty')
                 .then(id => {
                 return id
+            })
+        })
+
+    })
+})
+Cypress.Commands.add('getIdOrderByName', (pedido) => {
+    cy.getToken('a@a.com', 'a').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'/orders',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.data').then((res) => {
+            const result = res.find(({carriedOut}) => carriedOut === pedido)
+            cy.wrap(result).its('id')
+                .should('not.be.empty')
+                .then(id => {
+                    return id
+                })
+        })
+    })
+})
+Cypress.Commands.add('getCode', (user) => {
+    cy.getToken('a@a.com', 'a').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'/users',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.data').then((res) => {
+            const result = res.find(({email}) => email === user)
+            cy.wrap(result).its('confirmationCode')
+                .then(code => {
+                return code
             })
         })
 

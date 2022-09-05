@@ -1,12 +1,24 @@
 /// <reference types="cypress" />
-// cypress/support/commands.js
 import 'cypress-mailhog';
 
 let token 
-before(() => {                        
-    cy.getToken('f@f.com', 'f').then(tkn => { 
+before('Pegando token',() => {                        
+    cy.getToken('a@a.com', 'a').then(tkn => { 
             token = tkn  
   })
+})
+after('Criando o usuario deletado',() => {
+    cy.request({
+        method:'POST',
+        url: '/auth/register',
+        body:{
+            email: "c@c.com",
+            document: "12345678234",
+            birthdate: "15092002",
+            password: "c"
+        }
+    })
+
 })
 
 it.skip('Deve registar um usuario', () => {
@@ -14,10 +26,10 @@ it.skip('Deve registar um usuario', () => {
         method:'POST',
         url: '/auth/register',
         body:{
-        email: "f@f.com",
+        email: "h@h.com",
         document: "12345678968",
         birthdate: "15092002",
-        password: "f"
+        password: "g"
         }
     }).as('response')
 
@@ -33,8 +45,8 @@ it('Deve fazer login em uma conta', () => {
         method: 'POST',
         url: '/auth/login',
         body: {  
-            email: "f@f.com",
-            password: "f"
+            email: "a@a.com",
+            password: "a"
         }
     }).as('response')
 
@@ -43,9 +55,26 @@ it('Deve fazer login em uma conta', () => {
         expect(res.body.status).to.equal(200)
         expect(res.body.message).to.be.equal('Logged in successfully')
     })
-
 })
-it('Deve registrar uma conta com o mesmo email', () => {
+
+it('Não deve fazer login com uma senha errada', () => {
+    cy.request({
+        method: 'POST',
+        url: '/auth/login',
+        body: {  
+            email: "a@a.com",
+            password: "kk"
+        }, 
+        failOnStatusCode: false
+    }).as('response')
+
+    cy.get('@response').then(res => {
+        expect(res.body.status).to.equal(401)
+        expect(res.body.message).to.be.equal('Could not login, invalid credentials')
+    })
+})
+
+it('Não deve registrar uma conta com o mesmo email', () => {
     cy.request({
         method:'POST',
         url: '/auth/register',
@@ -70,7 +99,7 @@ it('Deve mandar um código de confirmacao', () => {
         method: 'POST',
         url: '/auth/forgot_password/send_confirmation_code',
         body: {
-            email: 'f@f.com'
+            email: 'b@b.com'
         }
     }).as('response')
 
@@ -80,28 +109,50 @@ it('Deve mandar um código de confirmacao', () => {
     })
 })
 
-it.skip('Deve trocar a senha',() => {
+
+it('Não deve trocar a senha com um código errado',() => {
     cy.request({
         method: 'POST',
         url: '/auth/forgot_password/change_password',
         body:{
-        "email": "d@d.com",
-        "confirmationCode": 3493,
-        "newPassword": "d"
-        }
+        "email": "b@b.com",
+        "confirmationCode": 1000,
+        "newPassword": "bb"
+        }, 
+        failOnStatusCode: false
     }).as('response')
 
     cy.get('@response').then(res =>{
-        expect(res.status).eq(200)
-        expect(res.body.message).eq('Password changed successfully')
+        expect(res.status).eq(401)
+        expect(res.body.message).eq('Could not change password, unauthorized payload')
     })
 })
-it('Deve listar todos os usuários', () =>{
+
+it('Deve trocar a senha',() => {
+    cy.getCode('b@b.com').then(code => {   
         cy.request({
-            method: 'GET',
-            url:'/users',
-            headers:{ Authorization: `Bearer ${token}` }
+            method: 'POST',
+            url: '/auth/forgot_password/change_password',
+            body:{
+            "email": "b@b.com",
+            "confirmationCode": `${code}`,
+            "newPassword": "b"
+            }
         }).as('response')
+
+        cy.get('@response').then(res =>{
+            expect(res.status).eq(200)
+            expect(res.body.message).eq('Password changed successfully')
+        })
+})
+})
+
+it('Deve listar todos os usuários', () =>{
+    cy.request({
+        method: 'GET',
+        url:'/users',
+        headers:{ Authorization: `Bearer ${token}` }
+    }).as('response')
     
     cy.get('@response').then(res => {
         expect(res.status).eq(200)  
@@ -111,37 +162,37 @@ it('Deve listar todos os usuários', () =>{
     
 })
 
+
 it('Deve procurar por id', () => {
-    cy.getId('f@f.com', 'f').then(id => {    
-            cy.request({
-                method: 'GET',
-                url : `users/${id}`,
-                headers: {Authorization : `Bearer ${token}`},
+    cy.getId('Leonardobrito@teste.com').then(id => {    
+         cy.request({
+            method: 'GET',
+            url : `users/${id}`,
+            headers: {Authorization : `Bearer ${token}`},
         }).as('response')
 })
     cy.get('@response').then(res => {
-     expect(res.status).eq(200)  
-     expect(res.body.message).eq('User found successfully')
-     expect(res.body.data.user.email).not.be.empty
+        expect(res.status).eq(200)  
+        expect(res.body.message).eq('User found successfully')
+        expect(res.body.data.user.email).not.be.empty
 
 })
     
 })
-// it.only('Deve ativar um usuário', () => {
-//     cy.getToken('c@c.com', 'c').then(token => {
+
+// it('Deve ativar um usuário', () => {
 //         cy.request({
 //             method: 'POST',
 //             url: '/users',
 //             headers:{ Authorization: `Bearer ${token}` },
 //             body: {
-//                 "email": "c@c.com",
+//                 "email": "e@e.com",
 //                 "document": "12345678910",
 //                 "birthdate": "10102000",
-//                 "password": "c",
+//                 "password": "e",
 //                 "status": "ACTIVE"
 //             }
 //         }).as('response')
-// })
 //     cy.get('@response').then(res => {
 //         expect(res.status).eq(200)
 //         expect(res.body.message).eq('User stored successfully')
@@ -149,19 +200,19 @@ it('Deve procurar por id', () => {
 //     })
 // })
 
-it.skip('Deve alterar um usuário', () => {
-    cy.getId('e@e.com', 'e').then(id => {
-            cy.request({
-                method: 'PUT',
-                url : `/users/${id}`,
-                headers: {Authorization : `Bearer ${token}`},
-                body: {
-                    "email": "d@d.com",
-                    "document": "12345678235",
-                    "birthdate": "14082000",
-                    "password": "d",
-                    "status": "ACTIVE"
-                }
+it('Deve alterar um usuário', () => {
+    cy.getId('b@b.com').then(id => {
+        cy.request({
+            method: 'PUT',
+            url : `/users/${id}`,
+            headers: {Authorization : `Bearer ${token}`},
+            body: {
+                "email": "b@b.com",
+                "document": "13446678998",
+                "birthdate": "14082000",
+                "password": "b",
+                "status": "ACTIVE"
+            }
         }).as('response')
 })
     cy.get('@response').then(res => {
@@ -171,12 +222,12 @@ it.skip('Deve alterar um usuário', () => {
 })
 
 it('Deve deletar o usuario', () => {
-    cy.getId('f@f.com', 'f').then(id => {
-            cy.request({
-                method: 'DELETE',
-                url : `/users/${id}`,
-                headers: { Authorization : `Bearer ${token}`}
-            }).as('response')
+    cy.getId('c@c.com').then(id => {
+        cy.request({
+            method: 'DELETE',
+            url : `/users/${id}`,
+            headers: { Authorization : `Bearer ${token}`}
+        }).as('response')
 
     })
     cy.get('@response').then(res => {
@@ -184,27 +235,3 @@ it('Deve deletar o usuario', () => {
         expect(res.body.message).eq('User destroyed successfully')
     })
 })
-
-
-
-describe.skip('Verificar caixa de entrada - emails', () => {
-    it('Verification titulo de um email', () => {
-        cy.mhGetAllMails().mhFirst().mhGetSubject()
-            .should('eq', 'Your account is now confirmed')
-        cy.mhGetMailsBySubject('Your account is now confirmed')
-        .should('have.length', 1);
-    })
-    it('Verificando o body do email', () => {
-        cy.mhGetMailsBySubject('Your account is now confirmed')
-        .mhFirst().mhGetBody()
-        .should('contain', 'username')     
-        })
-})
-
-
-
-
-    
-
-
-   
