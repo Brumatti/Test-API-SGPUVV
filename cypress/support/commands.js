@@ -37,21 +37,21 @@ Cypress.Commands.add('getToken', (user, passwd) => {
        return token
     })
 } )
-Cypress.Commands.add('getIndex', (user, passwd) => {
-    let arr = []
-    cy.getToken(user, passwd).then(token => {
+Cypress.Commands.add('getNick', (user) => {
+    cy.getToken('a@a.com', 'a').then(token => {
         cy.request({
             method: 'GET',
-            url:'/users',
+            url:'/cards',
             headers:{ Authorization: `Bearer ${token}` }
-        }).its('body.data.data')
-            .then((list) => Cypress._.map(list, 'email'))
-            .should('contain', user)
-            .then(res => arr.push(res))
-    }).then(() => {    
-        let a = arr[0].indexOf(user)
-        console.log(a)
-        return a
+        }).its('body.data.data').then((res) => {
+            const result = res.find(({nickName}) => nickName === user)
+            cy.wrap(result).its('id')
+                .should('not.be.empty')
+                .then(id => {
+                return id
+            })
+        })
+
     })
 })
 Cypress.Commands.add('getId', (user) => {

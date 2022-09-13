@@ -18,3 +18,15 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+require('cypress-xpath');
+
+
+  Cypress.SelectorPlayground.defaults({
+    onElement: ($el) => {
+      const customId = $el.attr('name')
+  
+      if (customId) {
+        return `[name=${customId}]`
+      }
+    },
+  })
