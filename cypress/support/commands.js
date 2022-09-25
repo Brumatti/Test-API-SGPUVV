@@ -72,12 +72,12 @@ Cypress.Commands.add('getId', (user) => {
     })
 })
 Cypress.Commands.add('getIdOrderByName', (pedido) => {
-    cy.getToken('a@a.com', 'a').then(token => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
         cy.request({
             method: 'GET',
             url:'/orders',
             headers:{ Authorization: `Bearer ${token}` }
-        }).its('body.data.data').then((res) => {
+        }).its('body.data.orders').then((res) => {
             const result = res.find(({carriedOut}) => carriedOut === pedido)
             cy.wrap(result).its('id')
                 .should('not.be.empty')
@@ -88,12 +88,12 @@ Cypress.Commands.add('getIdOrderByName', (pedido) => {
     })
 })
 Cypress.Commands.add('getCode', (user) => {
-    cy.getToken('a@a.com', 'a').then(token => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
         cy.request({
             method: 'GET',
             url:'/users',
             headers:{ Authorization: `Bearer ${token}` }
-        }).its('body.data.data').then((res) => {
+        }).its('body.data').then((res) => {
             const result = res.find(({email}) => email === user)
             cy.wrap(result).its('confirmationCode')
                 .then(code => {

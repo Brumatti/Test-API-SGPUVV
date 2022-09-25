@@ -1,87 +1,109 @@
 /// <reference types="cypress" />
 
 let token //variavel global do token
-before('Pegando token',() => {                        
+before('Pegando token', () => {
     cy.getToken('aa@aa.com', 'aaaaaaaaa')
-        .then(tkn => { 
-            token = tkn  
+        .then(tkn => {
+            token = tkn
         })
+})
+
+after('Criando o pedido deletado', () => {
+    cy.request({
+        method: 'POST',
+        url: '/orders',
+        headers: { Authorization: `Bearer ${token}` },
+        body: {
+            "userId": "493717c9-4e6d-4aac-90d4-00c0c9deecfa",
+            "addressId": "8f4fa19d-e872-4fe0-86c0-a34908f8e44c",
+            "solicitationDate": "2022-09-25T18:24:05.534Z",
+            "carriedOut": "test123",
+            "estimatedDeliveryDate": "2022-09-25T18:24:05.534Z",
+            "deliveryDate": "2022-09-25T18:24:05.534Z",
+            "price": 10,
+            "status": "ACTIVE"
+        }
+
+    })
+
 })
 
 
 describe('Testes de rota de pedido', () => {
 
-    it('Deve criar um pedido', () => {
-    cy.getId('aa@aa.com').then(id => {
-        cy.request({
-        method: 'POST',
-        url: '/orders',
-        headers: { Authorization : `${token}`},
-        body: {    
-            "userId": `${id}`,
-            "solicitationDate": "2022-08-25 14:05:24",
-            "carriedOut": "test",
-            "estimatedDeliveryDate": "2022-09-10 14:05:24",
-            "deliveryDate": "2022-09-10 14:05:24",
-            "price": 10,
-            "orderStatus": "ACTIVE"
-            }
-            
-        }).as('response')
-    })
+    it.skip('Deve criar um pedido', () => {
+        cy.getId('aa@aa.com').then(id => {
+            cy.request({
+                method: 'POST',
+                url: 'orders',
+                headers: { Authorization: `Bearer ${token}` },
+                body: {
+                    "userId": `${id}`,
+                    "addressId": "8f4fa19d-e872-4fe0-86c0-a34908f8e44c",
+                    "solicitationDate": "2022-09-25T18:24:05.534Z",
+                    "carriedOut": "test123",
+                    "estimatedDeliveryDate": "2022-09-25T18:24:05.534Z",
+                    "deliveryDate": "2022-09-25T18:24:05.534Z",
+                    "price": 10,
+                    "status": "ACTIVE"
+                }
+
+            }).as('response')
+        })
         cy.get('@response').then(res => {
             expect(res.status).eq(200)
-            expect(res.body.message).eq('Order stored successfully')
-            expect(res.body.data.order.orderStatus).eq('ACTIVE')
+            expect(res.body.message).eq('Order created successfully')
+            expect(res.body.data.status).eq('ACTIVE')
         })
     })
 
-    it.only('Listar pedidos', () => {
+    it('Listar pedidos', () => {
         cy.request({
             method: 'GET',
             url: '/orders',
-            headers: { Authorization :`Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
 
         }).as('response')
 
         cy.get('@response').then(res => {
             expect(res.status).eq(200)
-            expect(res.body.message).eq('Fetching order')
-            expect(res.body.data.data).to.not.be.empty
+            expect(res.body.message).eq('Orders fetched successfully')
+            expect(res.body.data).to.not.be.empty
         })
     })
 
     it('Deve procurar por id do pedido', () => {
-        cy.getIdOrderByName('test').then(id => {    
-             cy.request({
+        cy.getIdOrderByName('test123').then(id => {
+            cy.request({
                 method: 'GET',
-                url : `orders/${id}`,
-                headers: {Authorization : `Bearer ${token}`},
+                url: `orders/${id}`,
+                headers: { Authorization: `Bearer ${token}` },
             }).as('response')
         })
 
         cy.get('@response').then(res => {
-            expect(res.status).eq(200)  
-            expect(res.body.message).eq('Order found successfully')
-            expect(res.body.data.order).to.not.be.empty
-        })   
+            expect(res.status).eq(200)
+            expect(res.body.message).eq('Order fetched successfully')
+            expect(res.body.data).to.not.be.empty
+        })
     })
 
+
     it('Deve atualizar um pedido', () => {
-        cy.getIdOrderByName('test').then(id => {
+        cy.getIdOrderByName('test123').then(id => {
             cy.request({
                 method: 'PUT',
                 url: `orders/${id}`,
                 headers: { Authorization: `Bearer ${token}` },
                 body: {
-
                     "userId": `${id}`,
-                    "solicitationDate": "2022-08-25 14:05:24",
-                    "carriedOut": "test",
-                    "estimatedDeliveryDate": "2022-08-25 14:05:24",
-                    "deliveryDate": "2022-08-25 14:05:24",
-                    "price": 20,
-                    "orderStatus": "ACTIVE"
+                    "addressId": "8f4fa19d-e872-4fe0-86c0-a34908f8e44c",
+                    "solicitationDate": "2022-09-25T18:24:05.534Z",
+                    "carriedOut": "test123",
+                    "estimatedDeliveryDate": "2022-09-25T18:24:05.534Z",
+                    "deliveryDate": "2022-09-25T18:24:05.534Z",
+                    "price": 10,
+                    "status": "ACTIVE"
                 }
             }).as('response')
         })
@@ -93,17 +115,17 @@ describe('Testes de rota de pedido', () => {
     })
 
     it('Deve deletar o pedido', () => {
-        cy.getIdOrderByName('test').then(id => {
+        cy.getIdOrderByName('test123').then(id => {
             cy.request({
                 method: 'DELETE',
                 url: `orders/${id}`,
-                headers: { Authorization :`Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` }
             }).as('response')
         })
 
         cy.get('@response').then(res => {
             expect(res.status).eq(200)
-            expect(res.body.message).eq('Order destroyed successfully')
+            expect(res.body.message).eq('Order deleted successfully')
         })
     })
 })
