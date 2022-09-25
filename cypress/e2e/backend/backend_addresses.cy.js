@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+//NAO AUTOMATIZADA
+
 let token
 before('Pegando token', () => {
     cy.getToken('aa@aa.com', 'aaaaaaaaa').then(tkn => {
@@ -46,7 +48,7 @@ it('Deve listar os endereços', () => {
 it('Deve encontrar um endereço por ID', () => {
         cy.request({
            method: 'GET',
-           url : `addresses/13fbca28-c129-42e0-8e24-f6048bb80dd5`,
+           url : `addresses/8f4fa19d-e872-4fe0-86c0-a34908f8e44c`,
            headers: {Authorization : `Bearer ${token}`}
        }).as('response')
 
@@ -79,7 +81,7 @@ it('Deve alterar um endereço', () => {
         expect(res.body.message).eq('Address updated successfully')
     })
 })
-it('Deve deletar um endereço', () => {
+it.skip('Deve deletar um endereço', () => {
     cy.request({
         method: 'DELETE',
         url: `addresses/13fbca28-c129-42e0-8e24-f6048bb80dd5`,
