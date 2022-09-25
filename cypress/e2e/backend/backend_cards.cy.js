@@ -2,76 +2,94 @@
 
 let token
 before('Pegando token', () => {
-    cy.getToken('a@a.com', 'a').then(tkn => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(tkn => {
         token = tkn
     })
 })
 
-it.only('Deve registar um cartão', () => {
+after('Cria o cartão deletado', () => {
     cy.request({
         method: 'POST',
-        url: '/cards',
-        headers: { Authorization : `${token}`},
+        url: 'cards',
+        headers: { Authorization : `Bearer ${token}`},
         body: {
-            "userId": "05f3d6d5-cd83-4295-969a-64cfb5513f63",
-            "number": "33453454",
-            "cardholder": "testeteste",
+            "userId": "5e23f7e7-4c5a-4f19-a58d-48c0bc31a1b1",
+            "number": 223456789,
+            "cardholder": "baboboba",
             "dueDate": "21212332",
-            "cvc": "234",
-            "document": "12345678911",
-            "nickName" : "Mart"
+            "cvc": 204,
+            "document": "198293900",
+            "nickName" : "Arroz"
+        }
+    })
+})
+it.skip('Deve registar um cartão', () => {
+    cy.request({
+        method: 'POST',
+        url: 'cards',
+        headers: { Authorization : `Bearer ${token}`},
+        body: {
+            "userId": "4723d3ad-9886-489f-8ab2-6a8885a36c8c",
+            "number": 123456789,
+            "cardholder": "abobobb",
+            "dueDate": "21212332",
+            "cvc": 234,
+            "document": "198293929",
+            "nickName" : "Arroz"
         }
     }).as('response')
 
     cy.get('@response').then(res => {
-        expect(res.status).equal(200)
+        expect(res.status).equal(201)
+        expect(res.body.message).eq('Card created successfully')
+        expect(res.body.data.cardholder).to.not.be.empty
 
     })
 })
 it('Listar cartões', () => {
     cy.request({
         method: 'GET',
-        url: '/card',
+        url: '/cards',
         headers: { Authorization :`Bearer ${token}` }
 
     }).as('response')
 
     cy.get('@response').then(res => {
         expect(res.status).eq(200)
-        expect(res.body.message).eq('Fetching cards')
+        expect(res.body.message).eq('Cards fetched successfully')
+        expect(res.body.data.cards).to.not.be.empty
     })
 })
 
 it('Deve procurar por um cartão', () => {
-    cy.getIdOrderByName('test').then(id => {    
+    cy.getNick('Arroz').then(id => {    
          cy.request({
             method: 'GET',
-            url : `card/${id}`,
+            url : `cards/${id}`,
             headers: {Authorization : `Bearer ${token}`},
         }).as('response')
     })
 
     cy.get('@response').then(res => {
         expect(res.status).eq(200)  
-        expect(res.body.message).eq('Card found successfully')
+        expect(res.body.message).eq('Card fetched successfully')
     })   
 })
 
 it('Deve atualizar um cartão', () => {
-    cy.getIdOrderByName('test').then(id => {
+    cy.getNick('Batata').then(id => {
         cy.request({
             method: 'PUT',
-            url: `card/${id}`,
+            url: `cards/${id}`,
             headers: { Authorization: `Bearer ${token}` },
             body: {
-
                 "userId": `${id}`,
-                "solicitationDate": "2022-08-25 14:05:24",
-                "carriedOut": "test",
-                "estimatedDeliveryDate": "2022-08-25 14:05:24",
-                "deliveryDate": "2022-08-25 14:05:24",
-                "price": 20,
-                "orderStatus": "ACTIVE"
+                "number": 123456789,
+                "cardholder": "abobobb",
+                "dueDate": "21212332",
+                "cvc": 234,
+                "document": "198293929",
+                "nickName": "Batata"
             }
         }).as('response')
     })
@@ -83,16 +101,16 @@ it('Deve atualizar um cartão', () => {
 })
 
 it('Deve deletar o cartão', () => {
-    cy.getIdOrderByName('test').then(id => {
+    cy.getNick('Arroz').then(id => {
         cy.request({
             method: 'DELETE',
-            url: `card/${id}`,
+            url: `cards/${id}`,
             headers: { Authorization :`Bearer ${token}` }
         }).as('response')
     })
 
     cy.get('@response').then(res => {
         expect(res.status).eq(200)
-        expect(res.body.message).eq('Card destroyed successfully')
+        expect(res.body.message).eq('Card deleted successfully')
     })
 })

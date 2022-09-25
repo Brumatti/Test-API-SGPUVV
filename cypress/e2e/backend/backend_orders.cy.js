@@ -2,7 +2,7 @@
 
 let token //variavel global do token
 before('Pegando token',() => {                        
-    cy.getToken('a@a.com', 'a')
+    cy.getToken('aa@aa.com', 'aaaaaaaaa')
         .then(tkn => { 
             token = tkn  
         })
@@ -12,7 +12,7 @@ before('Pegando token',() => {
 describe('Testes de rota de pedido', () => {
 
     it('Deve criar um pedido', () => {
-    cy.getId('a@a.com').then(id => {
+    cy.getId('aa@aa.com').then(id => {
         cy.request({
         method: 'POST',
         url: '/orders',
@@ -36,7 +36,7 @@ describe('Testes de rota de pedido', () => {
         })
     })
 
-    it('Listar pedidos', () => {
+    it.only('Listar pedidos', () => {
         cy.request({
             method: 'GET',
             url: '/orders',

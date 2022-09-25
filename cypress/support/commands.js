@@ -32,18 +32,18 @@ Cypress.Commands.add('getToken', (user, passwd) => {
             email: user,
             password: passwd
         }
-    }).its('body.data.token').should('not.be.empty') 
+    }).its('body.data.accessToken').should('not.be.empty') 
     .then(token => {
        return token
     })
 } )
 Cypress.Commands.add('getNick', (user) => {
-    cy.getToken('a@a.com', 'a').then(token => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
         cy.request({
             method: 'GET',
             url:'/cards',
             headers:{ Authorization: `Bearer ${token}` }
-        }).its('body.data.data').then((res) => {
+        }).its('body.data.cards').then((res) => {
             const result = res.find(({nickName}) => nickName === user)
             cy.wrap(result).its('id')
                 .should('not.be.empty')
@@ -55,12 +55,12 @@ Cypress.Commands.add('getNick', (user) => {
     })
 })
 Cypress.Commands.add('getId', (user) => {
-    cy.getToken('a@a.com', 'a').then(token => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
         cy.request({
             method: 'GET',
             url:'/users',
             headers:{ Authorization: `Bearer ${token}` }
-        }).its('body.data.data').then((res) => {
+        }).its('body.data.users').then((res) => {
             const result = res.find(({email}) => email === user)
             cy.wrap(result).its('id')
                 .should('not.be.empty')
