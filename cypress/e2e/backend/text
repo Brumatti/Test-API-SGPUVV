@@ -1,0 +1,15 @@
+it('Deve testar o endpoint GET de deliverymans', () => {
+    cy.request({
+        method: '',
+        url: '',
+        headers: { Authorization: `Bearer ${token}` },
+        body: {
+
+        }
+    }).as('response')
+
+	cy.get('@response').then(res => {
+        expect(res.status).eq(200)
+	    expect(res.body.message).eq('')
+    })
+})
