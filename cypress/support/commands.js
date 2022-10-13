@@ -104,4 +104,122 @@ Cypress.Commands.add('getCode', (user) => {
     })
 })
 
+Cypress.Commands.add('getIdGreetings', (msg) => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
+        cy.request({
+            method: 'GET',
+            url: 'greetings',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.greetings').then(res => {
+            const result = res.find(({message}) => message.startsWith(msg))
+            cy.wrap(result).its('id')
+            .then(id => {
+                return id
+            })
+
+        })
+
+    })
+})
+
+Cypress.Commands.add('getIdProducts', (prod) => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'products',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.products').then((res) => {
+            const result = res.find(({productName}) => productName === prod)
+            cy.wrap(result).its('id')
+                .then(id => {
+                return id
+            })
+        })
+
+    })
+})
+Cypress.Commands.add('getIdProductsCat', (prod) => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'productCategories',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.productCategorys').then((res) => {
+            const result = res.find(({productCategoryName}) => productCategoryName === prod)
+            cy.wrap(result).its('id')
+                .then(id => {
+                return id
+            })
+        })
+
+    })
+})
+Cypress.Commands.add('getIdRest', (rest) => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'restaurants',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.restaurants').then((res) => {
+            const result = res.find(({restaurantName}) => restaurantName === rest)
+            cy.wrap(result).its('id')
+                .then(id => {
+                return id
+            })
+        })
+
+    })
+})
+
+Cypress.Commands.add('getIdVoucher', (x) => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'vouchers',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.vouchers').then((res) => {
+            const result = res.find(({voucherDescription}) => voucherDescription === x)
+            cy.wrap(result).its('id')
+                .then(id => {
+                return id
+            })
+        })
+
+    })
+})
+
+Cypress.Commands.add('getIdPay', (x) => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'payments',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.payments').then((res) => {
+            const result = res.find(({name}) => name === x)
+            cy.wrap(result).its('id')
+                .then(id => {
+                return id
+            })
+        })
+
+    })
+})
+Cypress.Commands.add('getIdDeliv', (x) => {
+    cy.getToken('aa@aa.com', 'aaaaaaaaa').then(token => {
+        cy.request({
+            method: 'GET',
+            url:'deliverymans',
+            headers:{ Authorization: `Bearer ${token}` }
+        }).its('body.data.deliverymans').then((res) => {
+            const result = res.find(({plateNumber}) => plateNumber === x)
+            cy.wrap(result).its('id')
+                .then(id => {
+                return id
+            })
+        })
+
+    })
+})
+
+
 

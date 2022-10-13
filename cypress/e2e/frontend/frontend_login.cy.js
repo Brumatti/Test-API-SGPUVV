@@ -9,7 +9,7 @@ describe('Deve testar a um nível funcional', () => {
     })
 
     it('Deve fazer login', () => {
-        cy.login('a@a.com', 'a')
+        cy.login('aa@aa.com', 'aaaaaaaaa')
     })
 
     it('Não deve fazer login com um email incorreto', () => {
@@ -25,9 +25,9 @@ describe('Deve testar a um nível funcional', () => {
         cy.xpath("//body//div//span[contains(., 'Email obrigat')]//following-sibling::span[contains(., 'Senha obrigatória')]").should('contain', 'Senha obrigat')
     })
 
-    it.skip('Não deve fazer login com uma senha incorreta', () => {
-        cy.get('#email').type('a@a.com')
-        cy.get('#password').type('a')
+    it('Não deve fazer login com uma senha incorreta', () => {
+        cy.get('#email').type('aa@aa.com')
+        cy.get('#password').type('aaaaaaaa')
         cy.get('form > .MuiButton-root').click()
         cy.get(loc.LOGIN.MESSAGE).should('contain', 'email ou senha incorretos')
     })
